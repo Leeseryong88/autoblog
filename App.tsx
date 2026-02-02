@@ -391,7 +391,7 @@ const MainApp: React.FC = () => {
                 <button onClick={() => {
                   const text = `${generatedPost.title}\n\n` + generatedPost.sections.map(s => s.content).join('\n\n');
                   navigator.clipboard.writeText(text);
-                  alert('텍스트가 복사되었습니다. (이미지는 블로그 정책상 복사 붙여넣기가 되지 않으므로 직접 업로드해주셔야 합니다.)');
+                  alert('전체 텍스트가 복사되었습니다! (이미지는 블로그 정책상 복사 붙여넣기를 할 수 없으므로 직접 업로드해주셔야 합니다.)');
                 }} className="px-6 py-3 bg-gray-800 text-white rounded-2xl font-bold text-sm shadow-sm transition-all hover:bg-gray-900 active:scale-95">전체 텍스트 복사</button>
                 <button onClick={() => {
                   if (confirm('새 글을 작성하시겠습니까? 작성된 내용이 모두 사라집니다.')) {
