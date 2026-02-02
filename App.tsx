@@ -167,7 +167,7 @@ const MainApp: React.FC = () => {
           <button 
             onClick={() => setShowMessageCenter(true)}
             className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all relative"
-            title="고객센터"
+            title="제작자에게 문의하기"
           >
             <i className="fas fa-envelope"></i>
             {unreadCount > 0 && (
