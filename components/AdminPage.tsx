@@ -10,6 +10,7 @@ const AdminPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [selectedMessage, setSelectedMessage] = useState<Message | null>(null);
   const [replyText, setReplyText] = useState<{ [key: string]: string }>({});
+  const [creditInputs, setCreditInputs] = useState<{ [key: string]: string }>({});
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const { isAdmin } = useAuth();
@@ -184,20 +185,34 @@ const AdminPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                         >
                           {user.isInfinite ? '무제한 해제' : '무제한 설정'}
                         </button>
-                        <button
-                          onClick={() => user.id && handleAddCredits(user.id, 1)}
-                          disabled={actionLoading === user.id || !!user.isInfinite}
-                          className="px-3 py-1 bg-[#03c75a] text-white text-xs font-bold rounded-lg hover:bg-[#02b351] transition-all disabled:opacity-30"
-                        >
-                          +1회
-                        </button>
-                        <button
-                          onClick={() => user.id && handleAddCredits(user.id, 5)}
-                          disabled={actionLoading === user.id || !!user.isInfinite}
-                          className="px-3 py-1 bg-blue-500 text-white text-xs font-bold rounded-lg hover:bg-blue-600 transition-all disabled:opacity-30"
-                        >
-                          +5회
-                        </button>
+                        
+                        {!user.isInfinite && (
+                          <div className="flex items-center gap-1 bg-gray-50 p-1 rounded-lg border border-gray-100">
+                            <input 
+                              type="number" 
+                              min="1"
+                              placeholder="0"
+                              value={creditInputs[user.id!] || ''}
+                              onChange={(e) => setCreditInputs({ ...creditInputs, [user.id!]: e.target.value })}
+                              className="w-12 h-7 text-center text-xs font-bold bg-white border-none rounded-md focus:ring-1 focus:ring-[#03c75a] outline-none"
+                            />
+                            <button
+                              onClick={() => {
+                                const amt = parseInt(creditInputs[user.id!] || '0');
+                                if (amt > 0 && user.id) {
+                                  handleAddCredits(user.id, amt);
+                                  setCreditInputs({ ...creditInputs, [user.id!]: '' });
+                                } else {
+                                  alert('지급할 수량을 입력해주세요.');
+                                }
+                              }}
+                              disabled={actionLoading === user.id}
+                              className="h-7 px-2 bg-[#03c75a] text-white text-xs font-bold rounded-md hover:bg-[#02b351] transition-all disabled:opacity-30"
+                            >
+                              지급
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>
