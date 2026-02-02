@@ -4,6 +4,7 @@ import {
   onAuthStateChanged,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  sendEmailVerification,
   signOut as firebaseSignOut,
 } from "firebase/auth";
 import { auth } from "../lib/firebase";
@@ -12,6 +13,7 @@ import {
   initUserProfile,
   deductCredit,
   refundCredit,
+  grantEmailVerificationReward,
   CREDITS_PER_BLOG,
   UserProfile,
 } from "../services/creditsService";
@@ -66,6 +68,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (u) {
         await initUserProfile(u.uid, u.email || "");
         
+        // 이메일 인증 완료 시 보상 지급 체크
+        if (u.emailVerified) {
+          await grantEmailVerificationReward(u.uid);
+        }
+        
         // 실시간 프로필 동기화 추가
         unsubProfile = onSnapshot(doc(db, "users", u.uid), (docSnap) => {
           if (docSnap.exists()) {
@@ -94,6 +101,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signUp = async (email: string, password: string) => {
     const { user: newUser } = await createUserWithEmailAndPassword(auth, email, password);
     await initUserProfile(newUser.uid, newUser.email || "");
+    await sendEmailVerification(newUser);
   };
 
   const signOut = async () => {

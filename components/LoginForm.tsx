@@ -36,6 +36,8 @@ const LoginForm: React.FC = () => {
         await signIn(email, password);
       } else {
         await signUp(email, password);
+        alert("회원가입이 완료되었습니다! 입력하신 이메일로 인증 메일을 보냈습니다. 인증을 완료하시면 작성권 5개가 지급됩니다.");
+        setMode("login");
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "오류가 발생했습니다.";
@@ -69,7 +71,7 @@ const LoginForm: React.FC = () => {
         <p className="text-gray-500 text-sm">
           {mode === "login"
             ? "블로그 작성권을 사용해 AI 블로그를 작성해보세요"
-            : "가입 시 블로그 작성권 5회를 무료로 드려요"}
+            : "이메일 인증을 완료하면 작성권 5회를 바로 드려요"}
         </p>
       </div>
 

@@ -2,7 +2,7 @@ import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, orderBy } f
 import { db } from "../lib/firebase";
 
 const USERS_COLLECTION = "users";
-const INITIAL_CREDITS = 5;
+const INITIAL_CREDITS = 0;
 export const CREDITS_PER_BLOG = 1;
 
 export interface UserProfile {
@@ -10,6 +10,7 @@ export interface UserProfile {
   email: string;
   blogCredits: number;
   isInfinite?: boolean;
+  emailVerifiedRewardGiven?: boolean;
   createdAt: number;
 }
 
@@ -58,6 +59,7 @@ export const initUserProfile = async (userId: string, email: string): Promise<Us
     email,
     blogCredits: INITIAL_CREDITS,
     isInfinite: false,
+    emailVerifiedRewardGiven: false,
     createdAt: Date.now(),
   };
   await setDoc(userRef, profile);
@@ -90,4 +92,19 @@ export const refundCredit = async (userId: string): Promise<number> => {
   const newCredits = data.blogCredits + CREDITS_PER_BLOG;
   await updateDoc(userRef, { blogCredits: newCredits });
   return newCredits;
+};
+
+export const grantEmailVerificationReward = async (userId: string): Promise<boolean> => {
+  const userRef = doc(db, USERS_COLLECTION, userId);
+  const snap = await getDoc(userRef);
+  if (!snap.exists()) return false;
+  
+  const data = snap.data() as UserProfile;
+  if (data.emailVerifiedRewardGiven) return false;
+
+  await updateDoc(userRef, {
+    blogCredits: data.blogCredits + 5,
+    emailVerifiedRewardGiven: true
+  });
+  return true;
 };

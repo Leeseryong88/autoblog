@@ -52,7 +52,7 @@ const LandingPage: React.FC = () => {
               지금 바로 글쓰기 <i className="fas fa-magic ml-2"></i>
             </button>
             <div className="flex items-center gap-2 text-gray-400 font-medium ml-4">
-              <i className="fas fa-check-circle text-[#03c75a]"></i> 가입 시 작성권 5회 즉시 지급
+              <i className="fas fa-check-circle text-[#03c75a]"></i> 이메일 인증 시 작성권 5회 즉시 지급
             </div>
           </div>
         </div>
