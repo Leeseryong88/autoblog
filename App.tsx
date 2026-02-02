@@ -5,6 +5,7 @@ import StepProgress from './components/StepProgress';
 import LoginForm from './components/LoginForm';
 import AdminPage from './components/AdminPage';
 import MessageCenter from './components/MessageCenter';
+import LandingPage from './components/LandingPage';
 import { useAuth } from './context/AuthContext';
 import { generateBlogPost } from './services/geminiService';
 import { subscribeUserMessages, Message } from './services/messageService';
@@ -465,7 +466,8 @@ const AdminWrapper: React.FC = () => {
 const App: React.FC = () => {
   return (
     <Routes>
-      <Route path="/" element={<MainApp />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/write" element={<MainApp />} />
       <Route path="/admin" element={<AdminWrapper />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
