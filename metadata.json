@@ -1,0 +1,7 @@
+{
+  "name": "Gemini Blog Autowriter",
+  "description": "A multimodal React application that generates professional Naver-style restaurant blog posts from uploaded photos and basic restaurant information using Gemini 3 Flash.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
