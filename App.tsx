@@ -7,6 +7,7 @@ import LoginForm from './components/LoginForm';
 import AdminPage from './components/AdminPage';
 import MessageCenter from './components/MessageCenter';
 import LandingPage from './components/LandingPage';
+import NaverCallback from './components/NaverCallback';
 import { useAuth } from './context/AuthContext';
 import { generateBlogPost } from './services/geminiService';
 import { subscribeUserMessages, Message } from './services/messageService';
@@ -19,6 +20,7 @@ const MainApp: React.FC = () => {
   const [showMessageCenter, setShowMessageCenter] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [showStyleModal, setShowStyleModal] = useState(false);
+  const [showProfileModal, setShowProfileModal] = useState(false);
   const [isSavingStyle, setIsSavingStyle] = useState(false);
   
   // 모달 내 스타일 편집용 상태
@@ -181,18 +183,11 @@ const MainApp: React.FC = () => {
           </div>
           <div className="flex items-center gap-2">
             <button 
-              onClick={() => setShowStyleModal(true)}
-              className="w-9 h-9 md:w-10 md:h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all"
-              title="말투 설정하기"
-            >
-              <i className="fas fa-magic text-sm md:text-base"></i>
-            </button>
-            <button 
-              onClick={() => setShowMessageCenter(true)}
+              onClick={() => setShowProfileModal(true)}
               className="w-9 h-9 md:w-10 md:h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all relative"
-              title="제작자에게 문의하기"
+              title="내 정보"
             >
-              <i className="fas fa-envelope text-sm md:text-base"></i>
+              <i className="fas fa-user text-sm md:text-base"></i>
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] md:text-[10px] font-bold w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center border-2 border-[#f8f9fb] animate-bounce">
                   {unreadCount}
@@ -236,7 +231,7 @@ const MainApp: React.FC = () => {
       {showMessageCenter && <MessageCenter onClose={() => setShowMessageCenter(false)} />}
 
       {showStyleModal && createPortal(
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-2 md:p-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[300] flex items-center justify-center p-2 md:p-4">
           <div className="bg-white w-full max-w-2xl rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn max-h-[90vh]">
             <div className="p-6 md:p-8 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
               <div>
@@ -326,6 +321,75 @@ const MainApp: React.FC = () => {
               >
                 {isSavingStyle ? '저장 중...' : '설정 저장하기'}
               </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {showProfileModal && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-2 md:p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn">
+            <div className="p-6 md:p-8 border-b flex justify-between items-center bg-gray-50">
+              <h2 className="text-lg md:text-xl font-black text-gray-900">내 정보</h2>
+              <button onClick={() => setShowProfileModal(false)} className="text-gray-400 hover:text-gray-600">
+                <i className="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <div className="p-6 md:p-8 space-y-4">
+              <div className="bg-gray-50 p-5 rounded-3xl border border-gray-100">
+                <p className="text-xs text-gray-400 mb-1">로그인 계정 (네이버)</p>
+                <p className="text-sm font-bold text-gray-800">{user?.email}</p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  onClick={() => {
+                    setShowStyleModal(true);
+                  }}
+                  className="flex flex-col items-center justify-center p-5 bg-gray-50 rounded-3xl border border-gray-100 hover:bg-gray-100 hover:border-[#03c75a]/20 transition-all group"
+                >
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 mb-2 group-hover:text-[#03c75a] transition-colors">
+                    <i className="fas fa-magic"></i>
+                  </div>
+                  <span className="text-xs font-bold text-gray-700">말투 저장소</span>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setShowMessageCenter(true);
+                  }}
+                  className="flex flex-col items-center justify-center p-5 bg-gray-50 rounded-3xl border border-gray-100 hover:bg-gray-100 hover:border-[#03c75a]/20 transition-all group relative"
+                >
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-gray-400 mb-2 group-hover:text-[#03c75a] transition-colors">
+                    <i className="fas fa-envelope"></i>
+                  </div>
+                  <span className="text-xs font-bold text-gray-700">제작자 문의</span>
+                  {unreadCount > 0 && (
+                    <span className="absolute top-4 right-4 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-white animate-bounce">
+                      {unreadCount}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              <div className="bg-green-50 p-4 rounded-2xl border border-green-100 flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] text-green-600 font-bold mb-0.5">계정 상태</p>
+                  <p className="text-xs font-black text-green-700 flex items-center gap-1">
+                    <i className="fas fa-check-circle"></i> 네이버 인증 완료
+                  </p>
+                </div>
+                <div className="px-3 py-1 bg-white rounded-lg text-[10px] font-bold text-green-600 border border-green-200">
+                  {isInfinite ? '무제한 이용 중' : `작성권 ${credits}회`}
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 md:p-8 border-t bg-gray-50 flex gap-3">
+              <button onClick={() => setShowProfileModal(false)} className="flex-1 py-3 bg-white border border-gray-200 text-gray-500 rounded-2xl font-bold hover:bg-gray-50 transition-all text-sm">닫기</button>
+              <button onClick={() => signOut()} className="flex-1 py-3 bg-red-50 text-red-500 rounded-2xl font-bold hover:bg-red-100 transition-all text-sm">로그아웃</button>
             </div>
           </div>
         </div>,
@@ -631,6 +695,7 @@ const App: React.FC = () => {
       <Route path="/" element={<LandingPage />} />
       <Route path="/write" element={<MainApp />} />
       <Route path="/admin" element={<AdminWrapper />} />
+      <Route path="/callback" element={<NaverCallback />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

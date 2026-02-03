@@ -6,6 +6,8 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
   signOut as firebaseSignOut,
+  updatePassword,
+  fetchSignInMethodsForEmail,
 } from "firebase/auth";
 import { auth } from "../lib/firebase";
 import {
@@ -13,7 +15,8 @@ import {
   initUserProfile,
   deductCredit,
   refundCredit,
-  grantEmailVerificationReward,
+  grantNaverSignupReward,
+  checkUserExistsByEmail,
   CREDITS_PER_BLOG,
   UserProfile,
 } from "../services/creditsService";
@@ -26,8 +29,8 @@ interface AuthContextType {
   isInfinite: boolean;
   isAdmin: boolean;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signInWithNaver: (email: string, naverId: string) => Promise<void>;
+  signUpWithNaver: (email: string, naverId: string, extraData?: any) => Promise<void>;
   signOut: () => Promise<void>;
   useBlogCredit: () => Promise<boolean>;
   refundBlogCredit: () => Promise<void>;
@@ -72,19 +75,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     let unsubProfile: (() => void) | undefined;
 
     const unsubAuth = onAuthStateChanged(auth, async (u) => {
-      setUser(u);
       if (u) {
-        await initUserProfile(u.uid, u.email || "");
+        // Naver 가입 직후에는 signUpWithNaver에서 5회 이용권을 세팅하므로,
+        // 여기서는 데이터가 없을 때만 기본 프로필을 생성하도록 safe하게 처리
+        const userRef = doc(db, "users", u.uid);
+        const { getDoc } = await import("firebase/firestore");
+        const docSnap = await getDoc(userRef);
         
-        // 이메일 인증 완료 시 보상 지급 체크
-        if (u.emailVerified) {
-          await grantEmailVerificationReward(u.uid);
+        if (!docSnap.exists()) {
+          await initUserProfile(u.uid, u.email || "");
         }
+
+        setUser(u);
         
-        // 실시간 프로필 동기화 추가
-        unsubProfile = onSnapshot(doc(db, "users", u.uid), (docSnap) => {
-          if (docSnap.exists()) {
-            const data = docSnap.data() as UserProfile;
+        // 실시간 프로필 동기화
+        unsubProfile = onSnapshot(userRef, (snap) => {
+          if (snap.exists()) {
+            const data = snap.data() as UserProfile;
             setCredits(data.blogCredits);
             setIsInfinite(!!data.isInfinite);
             setWritingStyle(data.writingStyle || "");
@@ -92,6 +99,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           }
         });
       } else {
+        setUser(null);
         setCredits(0);
         setIsInfinite(false);
         setWritingStyle("");
@@ -106,14 +114,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+  const signInWithNaver = async (email: string, naverId: string) => {
+    // Naver 고유 ID를 비밀번호로 사용하여 로그인 시도
+    await signInWithEmailAndPassword(auth, email, naverId);
   };
 
-  const signUp = async (email: string, password: string) => {
-    const { user: newUser } = await createUserWithEmailAndPassword(auth, email, password);
-    await initUserProfile(newUser.uid, newUser.email || "");
-    await sendEmailVerification(newUser);
+  const signUpWithNaver = async (email: string, naverId: string, extraData?: any) => {
+    try {
+      const { user: newUser } = await createUserWithEmailAndPassword(auth, email, naverId);
+      // 네이버 회원가입 시 5회 이용권 지급 및 연동 상태 저장
+      await initUserProfile(newUser.uid, newUser.email || "", { ...extraData, isNaverLinked: true, naverId }, 5);
+    } catch (err: any) {
+      if (err.code === "auth/email-already-in-use") {
+        throw new Error("ALREADY_EXISTS");
+      }
+      throw err;
+    }
   };
 
   const signOut = async () => {
@@ -154,9 +170,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isInfinite,
     isAdmin: user?.email === ADMIN_EMAIL,
     loading,
-    signIn,
-    signUp,
     signOut,
+    signInWithNaver,
+    signUpWithNaver,
     useBlogCredit,
     refundBlogCredit,
     refreshCredits,
