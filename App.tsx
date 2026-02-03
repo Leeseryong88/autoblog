@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
-import { AppStep, PhotoData, BlogInfo, BlogType, GeneratedBlog } from './types';
+import { AppStep, PhotoData, BlogInfo, BlogType, GeneratedBlog, WritingStyle } from './types';
 import StepProgress from './components/StepProgress';
 import LoginForm from './components/LoginForm';
 import AdminPage from './components/AdminPage';
@@ -11,17 +12,30 @@ import { generateBlogPost } from './services/geminiService';
 import { subscribeUserMessages, Message } from './services/messageService';
 
 const MainApp: React.FC = () => {
-  const { user, credits, isInfinite, isAdmin, loading, signOut, useBlogCredit, refundBlogCredit } = useAuth();
+  const { user, credits, isInfinite, isAdmin, loading, signOut, useBlogCredit, refundBlogCredit, writingStyles, saveUserWritingStyles } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState<AppStep>(AppStep.SELECT_TYPE);
   const [photos, setPhotos] = useState<PhotoData[]>([]);
   const [showMessageCenter, setShowMessageCenter] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [showStyleModal, setShowStyleModal] = useState(false);
+  const [isSavingStyle, setIsSavingStyle] = useState(false);
+  
+  // 모달 내 스타일 편집용 상태
+  const [editingStyles, setEditingStyles] = useState<WritingStyle[]>([]);
+  const [newStyle, setNewStyle] = useState({ title: '', content: '' });
 
   const [blogInfo, setBlogInfo] = useState<BlogInfo>({
     type: BlogType.RESTAURANT,
-    name: '', location: '', mainMenu: '', subject: '', category: '', mood: '', specialNotes: '', rating: 4
+    name: '', location: '', mainMenu: '', subject: '', category: '', mood: '', specialNotes: '', rating: 4,
+    writingStyle: ''
   });
+
+  useEffect(() => {
+    if (showStyleModal) {
+      setEditingStyles([...writingStyles]);
+    }
+  }, [showStyleModal, writingStyles]);
 
   const [generatedPost, setGeneratedPost] = useState<GeneratedBlog | null>(null);
 
@@ -118,7 +132,8 @@ const MainApp: React.FC = () => {
     setPhotos([]);
     setBlogInfo({
       type: BlogType.RESTAURANT,
-      name: '', location: '', mainMenu: '', subject: '', category: '', mood: '', specialNotes: '', rating: 4
+      name: '', location: '', mainMenu: '', subject: '', category: '', mood: '', specialNotes: '', rating: 4,
+      writingStyle: ''
     });
     setGeneratedPost(null);
   };
@@ -165,6 +180,13 @@ const MainApp: React.FC = () => {
         </div>
         <div className="flex items-center gap-3">
           <button 
+            onClick={() => setShowStyleModal(true)}
+            className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all"
+            title="말투 설정하기"
+          >
+            <i className="fas fa-magic"></i>
+          </button>
+          <button 
             onClick={() => setShowMessageCenter(true)}
             className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all relative"
             title="제작자에게 문의하기"
@@ -204,6 +226,103 @@ const MainApp: React.FC = () => {
       </header>
 
       {showMessageCenter && <MessageCenter onClose={() => setShowMessageCenter(false)} />}
+
+      {showStyleModal && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn max-h-[90vh]">
+            <div className="p-8 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
+              <div>
+                <h2 className="text-xl font-black text-gray-900">말투 저장소</h2>
+                <p className="text-xs text-gray-400 mt-1">자주 사용하는 블로그 말투를 저장해두세요.</p>
+              </div>
+              <button onClick={() => setShowStyleModal(false)} className="text-gray-400 hover:text-gray-600">
+                <i className="fas fa-times text-xl"></i>
+              </button>
+            </div>
+            
+            <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar flex-1">
+              {/* 새 말투 추가 */}
+              <div className="bg-green-50/50 p-6 rounded-3xl border border-[#03c75a]/10 space-y-4">
+                <h3 className="text-sm font-bold text-[#03c75a]">새 말투 추가</h3>
+                <input 
+                  type="text" 
+                  placeholder="말투 이름 (예: 친근한 언니 말투)" 
+                  value={newStyle.title}
+                  onChange={e => setNewStyle({...newStyle, title: e.target.value})}
+                  className="w-full p-4 bg-white rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
+                />
+                <textarea 
+                  placeholder="분석할 블로그 샘플 텍스트를 입력하세요." 
+                  rows={4}
+                  value={newStyle.content}
+                  onChange={e => setNewStyle({...newStyle, content: e.target.value})}
+                  className="w-full p-4 bg-white rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all resize-none"
+                />
+                <button 
+                  onClick={() => {
+                    if (!newStyle.title || !newStyle.content) {
+                      alert('제목과 내용을 모두 입력해주세요.');
+                      return;
+                    }
+                    const updated = [...editingStyles, { ...newStyle, id: Math.random().toString(36).substr(2, 9) }];
+                    setEditingStyles(updated);
+                    setNewStyle({ title: '', content: '' });
+                  }}
+                  className="w-full py-3 bg-[#03c75a] text-white rounded-xl font-bold text-sm hover:bg-[#02b351] transition-all"
+                >
+                  목록에 추가
+                </button>
+              </div>
+
+              {/* 저장된 말투 목록 */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-bold text-gray-500 ml-1">저장된 말투 목록 ({editingStyles.length})</h3>
+                {editingStyles.length === 0 ? (
+                  <p className="text-center py-10 text-gray-400 text-sm">저장된 말투가 없습니다.</p>
+                ) : (
+                  editingStyles.map((style, idx) => (
+                    <div key={style.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group relative">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="font-bold text-gray-800 text-sm">{style.title}</span>
+                        <button 
+                          onClick={() => setEditingStyles(editingStyles.filter((_, i) => i !== idx))}
+                          className="text-gray-300 hover:text-red-500 transition-colors"
+                        >
+                          <i className="fas fa-trash-alt text-xs"></i>
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{style.content}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="p-8 border-t bg-gray-50 flex gap-4">
+              <button onClick={() => setShowStyleModal(false)} className="flex-1 py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl font-bold hover:bg-gray-50 transition-all">취소</button>
+              <button 
+                onClick={async () => {
+                  setIsSavingStyle(true);
+                  try {
+                    await saveUserWritingStyles(editingStyles);
+                    alert('성공적으로 저장되었습니다!');
+                    setShowStyleModal(false);
+                  } catch (err) {
+                    alert('저장 중 오류가 발생했습니다.');
+                  } finally {
+                    setIsSavingStyle(false);
+                  }
+                }}
+                disabled={isSavingStyle}
+                className="flex-[2] py-4 bg-[#03c75a] text-white rounded-2xl font-bold shadow-lg shadow-green-100 hover:bg-[#02b351] transition-all disabled:opacity-50"
+              >
+                {isSavingStyle ? '저장 중...' : '설정 저장하기'}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
 
       {step !== AppStep.SELECT_TYPE && <StepProgress currentStep={step} />}
 
@@ -328,6 +447,34 @@ const MainApp: React.FC = () => {
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-700 ml-1">분위기 또는 특징</label>
                 <input type="text" placeholder={isRestaurant ? "예: 힙한 느낌, 조용한, 데이트 코스" : "예: 가성비 좋은, 감성 넘치는, 실용적인"} value={blogInfo.mood} onChange={e => setBlogInfo({...blogInfo, mood: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-bold text-gray-700 ml-1">나만의 블로그 말투 선택 (선택)</label>
+                <div className="relative">
+                  <select 
+                    value={writingStyles.find(s => s.content === blogInfo.writingStyle)?.id || ''} 
+                    onChange={e => {
+                      if (e.target.value === 'ADD_NEW') {
+                        setShowStyleModal(true);
+                        return;
+                      }
+                      const selected = writingStyles.find(s => s.id === e.target.value);
+                      setBlogInfo({...blogInfo, writingStyle: selected ? selected.content : ''});
+                    }}
+                    className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all appearance-none"
+                  >
+                    <option value="">말투를 선택하지 않음 (기본 말투)</option>
+                    {writingStyles.map(style => (
+                      <option key={style.id} value={style.id}>{style.title}</option>
+                    ))}
+                    <option value="ADD_NEW" className="text-[#03c75a] font-bold">+ 새 말투 추가하기</option>
+                  </select>
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
+                    <i className="fas fa-chevron-down"></i>
+                  </div>
+                </div>
+                <p className="text-[10px] text-gray-400 ml-2 italic">* 상단 마법사 아이콘 버튼을 눌러 말투를 미리 저장해둘 수 있습니다.</p>
               </div>
 
               <div className="space-y-2">

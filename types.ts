@@ -17,6 +17,13 @@ export interface BlogInfo {
   mood: string;
   specialNotes: string;
   rating: number;
+  writingStyle?: string;
+}
+
+export interface WritingStyle {
+  id: string;
+  title: string;
+  content: string;
 }
 
 export interface PhotoData {

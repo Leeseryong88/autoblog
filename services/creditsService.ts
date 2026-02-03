@@ -11,6 +11,8 @@ export interface UserProfile {
   blogCredits: number;
   isInfinite?: boolean;
   emailVerifiedRewardGiven?: boolean;
+  writingStyle?: string; // Legacy field
+  writingStyles?: WritingStyle[];
   createdAt: number;
 }
 
@@ -107,4 +109,14 @@ export const grantEmailVerificationReward = async (userId: string): Promise<bool
     emailVerifiedRewardGiven: true
   });
   return true;
+};
+
+export const updateWritingStyle = async (userId: string, style: string): Promise<void> => {
+  const userRef = doc(db, USERS_COLLECTION, userId);
+  await updateDoc(userRef, { writingStyle: style });
+};
+
+export const saveWritingStyles = async (userId: string, styles: WritingStyle[]): Promise<void> => {
+  const userRef = doc(db, USERS_COLLECTION, userId);
+  await updateDoc(userRef, { writingStyles: styles });
 };

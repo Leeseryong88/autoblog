@@ -20,6 +20,8 @@ export const generateBlogPost = async (
 
   const prompt = `
     당신은 ${persona}입니다. 
+    ${info.writingStyle ? `[특별 지시: 다음은 사용자의 실제 블로그 말투 샘플입니다. 이 문체와 톤앤매너를 분석하여 동일하게 작성하세요: "${info.writingStyle}"]` : ''}
+    
     제공된 사진들과 ${contextInfo}, 분위기: ${info.mood}, 참고사항: ${info.specialNotes}를 바탕으로 네이버 블로그 스타일의 정성스러운 포스팅을 작성하세요.
 
     [실시간 검색 활용 지침]

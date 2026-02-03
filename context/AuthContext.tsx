@@ -32,6 +32,10 @@ interface AuthContextType {
   useBlogCredit: () => Promise<boolean>;
   refundBlogCredit: () => Promise<void>;
   refreshCredits: () => Promise<void>;
+  writingStyle: string;
+  writingStyles: WritingStyle[];
+  updateUserWritingStyle: (style: string) => Promise<void>;
+  saveUserWritingStyles: (styles: WritingStyle[]) => Promise<void>;
 }
 
 const ADMIN_EMAIL = "kidcap1001@naver.com";
@@ -48,12 +52,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [credits, setCredits] = useState<number>(0);
   const [isInfinite, setIsInfinite] = useState<boolean>(false);
+  const [writingStyle, setWritingStyle] = useState<string>("");
+  const [writingStyles, setWritingStyles] = useState<WritingStyle[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refreshCredits = async () => {
     if (!user) {
       setCredits(0);
       setIsInfinite(false);
+      setWritingStyle("");
+      setWritingStyles([]);
       return;
     }
     const userRef = doc(db, "users", user.uid);
@@ -79,11 +87,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             const data = docSnap.data() as UserProfile;
             setCredits(data.blogCredits);
             setIsInfinite(!!data.isInfinite);
+            setWritingStyle(data.writingStyle || "");
+            setWritingStyles(data.writingStyles || []);
           }
         });
       } else {
         setCredits(0);
         setIsInfinite(false);
+        setWritingStyle("");
+        setWritingStyles([]);
         if (unsubProfile) unsubProfile();
       }
       setLoading(false);
@@ -107,6 +119,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const signOut = async () => {
     await firebaseSignOut(auth);
     setCredits(0);
+    setWritingStyle("");
   };
 
   const useBlogCredit = async (): Promise<boolean> => {
@@ -123,6 +136,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // setCredits and setIsInfinite are handled by onSnapshot
   };
 
+  const updateUserWritingStyle = async (style: string) => {
+    if (!user) return;
+    const { updateWritingStyle } = await import("../services/creditsService");
+    await updateWritingStyle(user.uid, style);
+  };
+
+  const saveUserWritingStyles = async (styles: WritingStyle[]) => {
+    if (!user) return;
+    const { saveWritingStyles } = await import("../services/creditsService");
+    await saveWritingStyles(user.uid, styles);
+  };
+
   const value: AuthContextType = {
     user,
     credits,
@@ -135,6 +160,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useBlogCredit,
     refundBlogCredit,
     refreshCredits,
+    writingStyle,
+    writingStyles,
+    updateUserWritingStyle,
+    saveUserWritingStyles,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
