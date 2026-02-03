@@ -60,24 +60,212 @@ const LandingPage: React.FC = () => {
 
       {/* Key Feature: Reference Analysis */}
       <section className="py-16 md:py-24 bg-[#f8f9fb]">
+        <style dangerouslySetInnerHTML={{ __html: `
+          @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+          }
+          @keyframes search-rotate {
+            0% { transform: rotate(0deg) scale(1); }
+            25% { transform: rotate(10deg) scale(1.1); }
+            75% { transform: rotate(-10deg) scale(1.1); }
+            100% { transform: rotate(0deg) scale(1); }
+          }
+          @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          @keyframes scroll-up {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); }
+          }
+          .animate-float {
+            animation: float 4s ease-in-out infinite;
+          }
+          .animate-search-rotate {
+            animation: search-rotate 4s ease-in-out infinite;
+          }
+          .animate-spin-slow {
+            animation: spin-slow 8s linear infinite;
+          }
+          .animate-scroll-up {
+            animation: scroll-up 20s linear infinite;
+          }
+          .animate-scroll-up:hover {
+            animation-play-state: paused;
+          }
+          .mask-fade-y {
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+          }
+        `}} />
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-16 items-center">
             <div className="relative order-2 md:order-1">
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-green-100 rounded-full blur-3xl opacity-50"></div>
-              <div className="relative bg-white p-6 md:p-8 rounded-3xl md:rounded-[3rem] shadow-2xl border border-gray-100">
+              <div className="relative bg-white p-6 md:p-8 rounded-3xl md:rounded-[3rem] shadow-2xl border border-gray-100 group animate-float overflow-hidden">
                 <div className="flex items-center gap-4 mb-6 md:mb-8">
-                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-500 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-xl">
+                  <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-50 text-blue-500 rounded-xl md:rounded-2xl flex items-center justify-center text-lg md:text-xl animate-search-rotate">
                     <i className="fas fa-search"></i>
                   </div>
                   <h3 className="text-lg md:text-xl font-black">실시간 레퍼런스 분석 중...</h3>
                 </div>
-                <div className="space-y-4">
-                  <div className="h-3 md:h-4 bg-gray-50 rounded-full w-3/4 animate-pulse"></div>
-                  <div className="h-3 md:h-4 bg-gray-50 rounded-full w-full animate-pulse"></div>
-                  <div className="h-3 md:h-4 bg-gray-50 rounded-full w-2/3 animate-pulse"></div>
-                  <div className="pt-4 border-t border-gray-50 mt-4">
+                
+                <div className="relative">
+                  <div className="h-64 md:h-80 overflow-hidden relative border-y border-gray-50 my-2 mask-fade-y">
+                    <div className="space-y-4 py-4 animate-scroll-up">
+                      {/* First set of items */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">네이버 블로그 레퍼런스 수집</span>
+                              <span className="text-[10px] md:text-xs font-bold text-blue-500">84%</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-blue-400 rounded-full" style={{ width: '84%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pl-5 space-y-2 border-l-2 border-gray-50 ml-1">
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-blue-300"></i>
+                            <span>"인생 파스타", "친절한 서비스" 키워드 추출</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-blue-300"></i>
+                            <span>메뉴판 이미지 데이터 매칭 완료 (봉골레 외 12종)</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">블로그 지수 최적화 분석</span>
+                              <span className="text-[10px] md:text-xs font-bold text-[#03c75a]">진행 중</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-[#03c75a] rounded-full" style={{ width: '45%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 pl-5">
+                          <i className="fas fa-spinner fa-spin mr-1"></i>
+                          <span>사용자 맞춤형 '친근한 언니' 말투 적용 분석 중...</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">이미지 구도 및 색감 분석</span>
+                              <span className="text-[10px] md:text-xs font-bold text-purple-500">완료</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-purple-400 rounded-full" style={{ width: '100%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pl-5 space-y-2 border-l-2 border-gray-50 ml-1">
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-purple-300"></i>
+                            <span>인스타 감성 필터링 및 조명 분석 완료</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-purple-300"></i>
+                            <span>메인 요리 중심 최적 구도 8개 선별</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-orange-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">방문자 반응 예측 시뮬레이션</span>
+                              <span className="text-[10px] md:text-xs font-bold text-orange-500">분석 중</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-orange-400 rounded-full" style={{ width: '62%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Second set of items (Clone for infinite scroll) */}
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-blue-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">네이버 블로그 레퍼런스 수집</span>
+                              <span className="text-[10px] md:text-xs font-bold text-blue-500">84%</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-blue-400 rounded-full" style={{ width: '84%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pl-5 space-y-2 border-l-2 border-gray-50 ml-1">
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-blue-300"></i>
+                            <span>"인생 파스타", "친절한 서비스" 키워드 추출</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-blue-300"></i>
+                            <span>메뉴판 이미지 데이터 매칭 완료 (봉골레 외 12종)</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">블로그 지수 최적화 분석</span>
+                              <span className="text-[10px] md:text-xs font-bold text-[#03c75a]">진행 중</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-[#03c75a] rounded-full" style={{ width: '45%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400 pl-5">
+                          <i className="fas fa-spinner fa-spin mr-1"></i>
+                          <span>사용자 맞춤형 '친근한 언니' 말투 적용 분석 중...</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-2 rounded-full bg-purple-400"></div>
+                          <div className="flex-1">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-[10px] md:text-xs font-bold text-gray-400">이미지 구도 및 색감 분석</span>
+                              <span className="text-[10px] md:text-xs font-bold text-purple-500">완료</span>
+                            </div>
+                            <div className="h-1.5 md:h-2 bg-gray-50 rounded-full w-full overflow-hidden">
+                              <div className="h-full bg-purple-400 rounded-full" style={{ width: '100%' }}></div>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="pl-5 space-y-2 border-l-2 border-gray-50 ml-1">
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-purple-300"></i>
+                            <span>인스타 감성 필터링 및 조명 분석 완료</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-[10px] md:text-xs text-gray-400">
+                            <i className="fas fa-check-circle text-purple-300"></i>
+                            <span>메인 요리 중심 최적 구도 8개 선별</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t border-gray-50 mt-4 flex justify-between items-center bg-white relative z-20">
                     <div className="flex items-center gap-2 text-[10px] md:text-xs font-bold text-blue-500">
-                      <i className="fas fa-link"></i> 관련 맛집 리뷰 1,245건 참조 완료
+                      <i className="fas fa-link animate-spin-slow"></i> 관련 맛집 리뷰 1,245건 참조 완료
+                    </div>
+                    <div className="flex -space-x-2">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="w-5 h-5 md:w-6 md:h-6 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center overflow-hidden">
+                          <i className="fas fa-user text-[8px] md:text-[10px] text-gray-300"></i>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>

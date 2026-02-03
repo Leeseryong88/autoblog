@@ -204,7 +204,7 @@ const MainApp: React.FC = () => {
 
         <div className="flex flex-wrap items-center justify-between gap-2 bg-white/50 p-2 rounded-2xl md:bg-transparent md:p-0">
           <div 
-            onClick={() => alert('더 많은 작성권이 필요하시면 제작자에게 문의하여 주시기 바랍니다.')}
+            onClick={() => alert('이용권 구매 시스템 적용예정입니다.')}
             className="flex items-center gap-2 bg-[#03c75a]/10 text-[#03c75a] px-3 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl font-bold cursor-pointer transition-all hover:bg-[#03c75a]/20 text-xs md:text-sm"
           >
             <i className="fas fa-coins"></i>
@@ -237,7 +237,7 @@ const MainApp: React.FC = () => {
 
       {showStyleModal && createPortal(
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-2 md:p-4">
-          <div className="bg-white w-full max-w-lg rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn max-h-[90vh]">
+          <div className="bg-white w-full max-w-2xl rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn max-h-[90vh]">
             <div className="p-6 md:p-8 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
               <div>
                 <h2 className="text-lg md:text-xl font-black text-gray-900">말투 저장소</h2>
@@ -257,14 +257,14 @@ const MainApp: React.FC = () => {
                   placeholder="말투 이름 (예: 친근한 언니 말투)" 
                   value={newStyle.title}
                   onChange={e => setNewStyle({...newStyle, title: e.target.value})}
-                  className="w-full p-3 md:p-4 bg-white rounded-xl border-none text-xs md:text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
+                  className="w-full p-4 md:p-5 bg-white rounded-2xl border border-gray-100 text-sm md:text-base font-bold outline-none focus:ring-2 focus:ring-[#03c75a] transition-all shadow-sm"
                 />
                 <textarea 
                   placeholder="분석할 블로그 샘플 텍스트를 입력하세요." 
-                  rows={4}
+                  rows={12}
                   value={newStyle.content}
                   onChange={e => setNewStyle({...newStyle, content: e.target.value})}
-                  className="w-full p-3 md:p-4 bg-white rounded-xl border-none text-xs md:text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all resize-none"
+                  className="w-full p-4 md:p-5 bg-white rounded-2xl border border-gray-100 text-sm md:text-base outline-none focus:ring-2 focus:ring-[#03c75a] transition-all resize-none shadow-sm"
                 />
                 <button 
                   onClick={() => {
@@ -276,9 +276,9 @@ const MainApp: React.FC = () => {
                     setEditingStyles(updated);
                     setNewStyle({ title: '', content: '' });
                   }}
-                  className="w-full py-2.5 md:py-3 bg-[#03c75a] text-white rounded-xl font-bold text-xs md:text-sm hover:bg-[#02b351] transition-all"
+                  className="w-full py-4 bg-[#03c75a] text-white rounded-2xl font-bold text-sm md:text-base hover:bg-[#02b351] shadow-lg shadow-green-100 transition-all active:scale-[0.98]"
                 >
-                  목록에 추가
+                  <i className="fas fa-plus mr-2"></i> 말투 목록에 추가하기
                 </button>
               </div>
 
