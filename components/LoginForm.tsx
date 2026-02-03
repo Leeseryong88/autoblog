@@ -60,36 +60,36 @@ const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md mx-auto p-10 animate-fadeIn">
-      <div className="text-center mb-10">
-        <div className="w-16 h-16 bg-[#03c75a] rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-6">
+    <div className="w-full max-w-md mx-auto p-6 md:p-10 animate-fadeIn">
+      <div className="text-center mb-8 md:mb-10">
+        <div className="w-14 h-14 md:w-16 md:h-16 bg-[#03c75a] rounded-2xl flex items-center justify-center text-white text-2xl md:text-3xl mx-auto mb-4 md:mb-6">
           <i className="fas fa-pen-nib"></i>
         </div>
-        <h2 className="text-2xl font-black text-gray-900 mb-2">
+        <h2 className="text-xl md:text-2xl font-black text-gray-900 mb-2">
           {mode === "login" ? "로그인" : "회원가입"}
         </h2>
-        <p className="text-gray-500 text-sm">
+        <p className="text-gray-500 text-xs md:text-sm">
           {mode === "login"
             ? "블로그 작성권을 사용해 AI 블로그를 작성해보세요"
             : "이메일 인증을 완료하면 작성권 5회를 바로 드려요"}
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-4 md:space-y-5">
         <div>
-          <label className="text-sm font-bold text-gray-700 ml-1 block mb-2">이메일</label>
+          <label className="text-xs md:text-sm font-bold text-gray-700 ml-1 block mb-2">이메일</label>
           <input
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder="example@email.com"
             required
-            className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
+            className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base"
           />
         </div>
 
         <div>
-          <label className="text-sm font-bold text-gray-700 ml-1 block mb-2">비밀번호</label>
+          <label className="text-xs md:text-sm font-bold text-gray-700 ml-1 block mb-2">비밀번호</label>
           <input
             type="password"
             value={password}
@@ -97,13 +97,13 @@ const LoginForm: React.FC = () => {
             placeholder="6자 이상"
             required
             minLength={6}
-            className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
+            className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base"
           />
         </div>
 
         {mode === "signup" && (
           <div>
-            <label className="text-sm font-bold text-gray-700 ml-1 block mb-2">
+            <label className="text-xs md:text-sm font-bold text-gray-700 ml-1 block mb-2">
               비밀번호 확인
             </label>
             <input
@@ -112,13 +112,13 @@ const LoginForm: React.FC = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="비밀번호를 다시 입력"
               required
-              className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
+              className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base"
             />
           </div>
         )}
 
         {error && (
-          <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-sm font-medium">
+          <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-xs md:text-sm font-medium">
             {error}
           </div>
         )}
@@ -126,7 +126,7 @@ const LoginForm: React.FC = () => {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-5 bg-[#03c75a] text-white font-bold rounded-2xl shadow-lg shadow-green-100 disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:bg-[#02b351] active:scale-[0.98]"
+          className="w-full py-4 md:py-5 bg-[#03c75a] text-white font-bold rounded-2xl shadow-lg shadow-green-100 disabled:opacity-70 disabled:cursor-not-allowed transition-all hover:bg-[#02b351] active:scale-[0.98] text-sm md:text-base"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">

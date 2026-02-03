@@ -170,57 +170,65 @@ const MainApp: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#f8f9fb] flex flex-col items-center py-8 px-4">
-      <header className="w-full max-w-4xl mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={resetApp}>
-          <div className="w-10 h-10 bg-[#03c75a] rounded-lg flex items-center justify-center text-white text-xl">
-            <i className="fas fa-pen-nib"></i>
+    <div className="min-h-screen bg-[#f8f9fb] flex flex-col items-center py-4 md:py-8 px-2 md:px-4">
+      <header className="w-full max-w-4xl mb-6 md:mb-8 flex flex-col gap-4">
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2 cursor-pointer" onClick={resetApp}>
+            <div className="w-8 h-8 md:w-10 md:h-10 bg-[#03c75a] rounded-lg flex items-center justify-center text-white text-lg md:text-xl">
+              <i className="fas fa-pen-nib"></i>
+            </div>
+            <h1 className="text-xl md:text-2xl font-bold text-gray-800 whitespace-nowrap">AI 블로그 오토라이터</h1>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">AI 블로그 오토라이터</h1>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => setShowStyleModal(true)}
+              className="w-9 h-9 md:w-10 md:h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all"
+              title="말투 설정하기"
+            >
+              <i className="fas fa-magic text-sm md:text-base"></i>
+            </button>
+            <button 
+              onClick={() => setShowMessageCenter(true)}
+              className="w-9 h-9 md:w-10 md:h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all relative"
+              title="제작자에게 문의하기"
+            >
+              <i className="fas fa-envelope text-sm md:text-base"></i>
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] md:text-[10px] font-bold w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center border-2 border-[#f8f9fb] animate-bounce">
+                  {unreadCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
-        <div className="flex items-center gap-3">
-          <button 
-            onClick={() => setShowStyleModal(true)}
-            className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all"
-            title="말투 설정하기"
-          >
-            <i className="fas fa-magic"></i>
-          </button>
-          <button 
-            onClick={() => setShowMessageCenter(true)}
-            className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-gray-50 hover:text-[#03c75a] transition-all relative"
-            title="제작자에게 문의하기"
-          >
-            <i className="fas fa-envelope"></i>
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-[#f8f9fb] animate-bounce">
-                {unreadCount}
-              </span>
-            )}
-          </button>
+
+        <div className="flex flex-wrap items-center justify-between gap-2 bg-white/50 p-2 rounded-2xl md:bg-transparent md:p-0">
           <div 
             onClick={() => alert('더 많은 작성권이 필요하시면 제작자에게 문의하여 주시기 바랍니다.')}
-            className="flex items-center gap-2 bg-[#03c75a]/10 text-[#03c75a] px-4 py-2 rounded-2xl font-bold cursor-pointer transition-all hover:bg-[#03c75a]/20"
+            className="flex items-center gap-2 bg-[#03c75a]/10 text-[#03c75a] px-3 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl font-bold cursor-pointer transition-all hover:bg-[#03c75a]/20 text-xs md:text-sm"
           >
             <i className="fas fa-coins"></i>
-            <span>{isInfinite ? '무제한 작성 가능' : `작성권 ${credits}회`}</span>
+            <span>{isInfinite ? '무제한' : `작성권 ${credits}회`}</span>
           </div>
-          {isAdmin && (
-            <button
-              onClick={() => navigate('/admin')}
-              className="px-4 py-2 bg-gray-800 text-white rounded-xl text-sm font-bold hover:bg-gray-900 transition-all"
-            >
-              <i className="fas fa-user-shield mr-2"></i> 관리자
-            </button>
-          )}
+          
           <div className="flex items-center gap-2">
-            <span className="text-sm text-gray-500">{user.email}</span>
-            <button
-              onClick={() => signOut()}
-              className="px-4 py-2 text-sm text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl transition-all"
-            >
-              로그아웃
-            </button>
+            {isAdmin && (
+              <button
+                onClick={() => navigate('/admin')}
+                className="px-3 py-1.5 md:px-4 md:py-2 bg-gray-800 text-white rounded-xl text-[10px] md:text-sm font-bold hover:bg-gray-900 transition-all"
+              >
+                <i className="fas fa-user-shield md:mr-2"></i> <span className="hidden md:inline">관리자</span>
+              </button>
+            )}
+            <div className="flex items-center gap-2 bg-gray-100/50 px-2 py-1 rounded-lg">
+              <span className="text-[10px] md:text-sm text-gray-500 max-w-[100px] md:max-w-none truncate">{user.email}</span>
+              <button
+                onClick={() => signOut()}
+                className="text-[10px] md:text-sm text-gray-500 font-bold hover:text-red-500 transition-all"
+              >
+                로그아웃
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -228,35 +236,35 @@ const MainApp: React.FC = () => {
       {showMessageCenter && <MessageCenter onClose={() => setShowMessageCenter(false)} />}
 
       {showStyleModal && createPortal(
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn max-h-[90vh]">
-            <div className="p-8 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-2 md:p-4">
+          <div className="bg-white w-full max-w-lg rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col animate-fadeIn max-h-[90vh]">
+            <div className="p-6 md:p-8 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
               <div>
-                <h2 className="text-xl font-black text-gray-900">말투 저장소</h2>
-                <p className="text-xs text-gray-400 mt-1">자주 사용하는 블로그 말투를 저장해두세요.</p>
+                <h2 className="text-lg md:text-xl font-black text-gray-900">말투 저장소</h2>
+                <p className="text-[10px] md:text-xs text-gray-400 mt-1">자주 사용하는 블로그 말투를 저장해두세요.</p>
               </div>
               <button onClick={() => setShowStyleModal(false)} className="text-gray-400 hover:text-gray-600">
                 <i className="fas fa-times text-xl"></i>
               </button>
             </div>
             
-            <div className="p-8 space-y-8 overflow-y-auto custom-scrollbar flex-1">
+            <div className="p-6 md:p-8 space-y-6 md:space-y-8 overflow-y-auto custom-scrollbar flex-1">
               {/* 새 말투 추가 */}
-              <div className="bg-green-50/50 p-6 rounded-3xl border border-[#03c75a]/10 space-y-4">
-                <h3 className="text-sm font-bold text-[#03c75a]">새 말투 추가</h3>
+              <div className="bg-green-50/50 p-4 md:p-6 rounded-3xl border border-[#03c75a]/10 space-y-3 md:space-y-4">
+                <h3 className="text-xs md:text-sm font-bold text-[#03c75a]">새 말투 추가</h3>
                 <input 
                   type="text" 
                   placeholder="말투 이름 (예: 친근한 언니 말투)" 
                   value={newStyle.title}
                   onChange={e => setNewStyle({...newStyle, title: e.target.value})}
-                  className="w-full p-4 bg-white rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
+                  className="w-full p-3 md:p-4 bg-white rounded-xl border-none text-xs md:text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all"
                 />
                 <textarea 
                   placeholder="분석할 블로그 샘플 텍스트를 입력하세요." 
                   rows={4}
                   value={newStyle.content}
                   onChange={e => setNewStyle({...newStyle, content: e.target.value})}
-                  className="w-full p-4 bg-white rounded-xl border-none text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all resize-none"
+                  className="w-full p-3 md:p-4 bg-white rounded-xl border-none text-xs md:text-sm outline-none focus:ring-2 focus:ring-[#03c75a] transition-all resize-none"
                 />
                 <button 
                   onClick={() => {
@@ -268,38 +276,38 @@ const MainApp: React.FC = () => {
                     setEditingStyles(updated);
                     setNewStyle({ title: '', content: '' });
                   }}
-                  className="w-full py-3 bg-[#03c75a] text-white rounded-xl font-bold text-sm hover:bg-[#02b351] transition-all"
+                  className="w-full py-2.5 md:py-3 bg-[#03c75a] text-white rounded-xl font-bold text-xs md:text-sm hover:bg-[#02b351] transition-all"
                 >
                   목록에 추가
                 </button>
               </div>
 
               {/* 저장된 말투 목록 */}
-              <div className="space-y-4">
-                <h3 className="text-sm font-bold text-gray-500 ml-1">저장된 말투 목록 ({editingStyles.length})</h3>
+              <div className="space-y-3 md:space-y-4">
+                <h3 className="text-xs md:text-sm font-bold text-gray-500 ml-1">저장된 말투 목록 ({editingStyles.length})</h3>
                 {editingStyles.length === 0 ? (
-                  <p className="text-center py-10 text-gray-400 text-sm">저장된 말투가 없습니다.</p>
+                  <p className="text-center py-10 text-gray-400 text-xs md:text-sm">저장된 말투가 없습니다.</p>
                 ) : (
                   editingStyles.map((style, idx) => (
-                    <div key={style.id} className="p-5 bg-gray-50 rounded-2xl border border-gray-100 group relative">
+                    <div key={style.id} className="p-4 md:p-5 bg-gray-50 rounded-2xl border border-gray-100 group relative">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="font-bold text-gray-800 text-sm">{style.title}</span>
+                        <span className="font-bold text-gray-800 text-xs md:text-sm">{style.title}</span>
                         <button 
                           onClick={() => setEditingStyles(editingStyles.filter((_, i) => i !== idx))}
                           className="text-gray-300 hover:text-red-500 transition-colors"
                         >
-                          <i className="fas fa-trash-alt text-xs"></i>
+                          <i className="fas fa-trash-alt text-[10px] md:text-xs"></i>
                         </button>
                       </div>
-                      <p className="text-xs text-gray-400 line-clamp-2 leading-relaxed">{style.content}</p>
+                      <p className="text-[10px] md:text-xs text-gray-400 line-clamp-2 leading-relaxed">{style.content}</p>
                     </div>
                   ))
                 )}
               </div>
             </div>
 
-            <div className="p-8 border-t bg-gray-50 flex gap-4">
-              <button onClick={() => setShowStyleModal(false)} className="flex-1 py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl font-bold hover:bg-gray-50 transition-all">취소</button>
+            <div className="p-6 md:p-8 border-t bg-gray-50 flex gap-3 md:gap-4">
+              <button onClick={() => setShowStyleModal(false)} className="flex-1 py-3 md:py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl font-bold hover:bg-gray-50 transition-all text-xs md:text-sm">취소</button>
               <button 
                 onClick={async () => {
                   setIsSavingStyle(true);
@@ -314,7 +322,7 @@ const MainApp: React.FC = () => {
                   }
                 }}
                 disabled={isSavingStyle}
-                className="flex-[2] py-4 bg-[#03c75a] text-white rounded-2xl font-bold shadow-lg shadow-green-100 hover:bg-[#02b351] transition-all disabled:opacity-50"
+                className="flex-[2] py-3 md:py-4 bg-[#03c75a] text-white rounded-2xl font-bold shadow-lg shadow-green-100 hover:bg-[#02b351] transition-all disabled:opacity-50 text-xs md:text-sm"
               >
                 {isSavingStyle ? '저장 중...' : '설정 저장하기'}
               </button>
@@ -326,35 +334,35 @@ const MainApp: React.FC = () => {
 
       {step !== AppStep.SELECT_TYPE && <StepProgress currentStep={step} />}
 
-      <main className="w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden min-h-[600px] flex flex-col border border-gray-100 transition-all duration-500">
+      <main className="w-full max-w-4xl bg-white rounded-3xl md:rounded-[2.5rem] shadow-2xl overflow-hidden min-h-[500px] md:min-h-[600px] flex flex-col border border-gray-100 transition-all duration-500">
         
         {/* Step 0: Select Type */}
         {step === AppStep.SELECT_TYPE && (
-          <div className="p-10 animate-fadeIn flex flex-col items-center justify-center h-full min-h-[600px]">
-            <h2 className="text-3xl font-black mb-2 text-gray-900 text-center">어떤 주제의 글을 쓸까요?</h2>
-            <p className="text-gray-500 mb-12 text-center">원하시는 블로그 테마를 선택해주세요.</p>
+          <div className="p-6 md:p-10 animate-fadeIn flex flex-col items-center justify-center h-full min-h-[500px] md:min-h-[600px]">
+            <h2 className="text-2xl md:text-3xl font-black mb-2 text-gray-900 text-center">어떤 주제의 글을 쓸까요?</h2>
+            <p className="text-sm md:text-base text-gray-500 mb-8 md:mb-12 text-center">원하시는 블로그 테마를 선택해주세요.</p>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-2xl">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 w-full max-w-2xl">
               <button 
                 onClick={() => { setBlogInfo({...blogInfo, type: BlogType.RESTAURANT}); setStep(AppStep.UPLOAD); }}
-                className="group p-8 rounded-[2rem] border-2 border-gray-100 hover:border-[#03c75a] hover:bg-green-50 transition-all text-left flex flex-col items-start"
+                className="group p-6 md:p-8 rounded-3xl md:rounded-[2rem] border-2 border-gray-100 hover:border-[#03c75a] hover:bg-green-50 transition-all text-left flex flex-col items-start"
               >
-                <div className="w-14 h-14 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-orange-100 text-orange-500 rounded-2xl flex items-center justify-center text-xl md:text-2xl mb-4 md:mb-6 group-hover:scale-110 transition-transform">
                   <i className="fas fa-utensils"></i>
                 </div>
-                <h3 className="text-xl font-bold mb-2">오늘의 맛집 리뷰</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">식당 이름, 위치, 메뉴 정보를 바탕으로 생생한 맛집 블로그를 작성합니다.</p>
+                <h3 className="text-lg md:text-xl font-bold mb-2">오늘의 맛집 리뷰</h3>
+                <p className="text-gray-400 text-xs md:text-sm leading-relaxed">식당 이름, 위치, 메뉴 정보를 바탕으로 생생한 맛집 블로그를 작성합니다.</p>
               </button>
 
               <button 
                 onClick={() => { setBlogInfo({...blogInfo, type: BlogType.GENERAL}); setStep(AppStep.UPLOAD); }}
-                className="group p-8 rounded-[2rem] border-2 border-gray-100 hover:border-[#03c75a] hover:bg-green-50 transition-all text-left flex flex-col items-start"
+                className="group p-6 md:p-8 rounded-3xl md:rounded-[2rem] border-2 border-gray-100 hover:border-[#03c75a] hover:bg-green-50 transition-all text-left flex flex-col items-start"
               >
-                <div className="w-14 h-14 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition-transform">
+                <div className="w-12 h-12 md:w-14 md:h-14 bg-blue-100 text-blue-500 rounded-2xl flex items-center justify-center text-xl md:text-2xl mb-4 md:mb-6 group-hover:scale-110 transition-transform">
                   <i className="fas fa-star"></i>
                 </div>
-                <h3 className="text-xl font-bold mb-2">자유 주제/일상 리뷰</h3>
-                <p className="text-gray-400 text-sm leading-relaxed">일상 기록, 제품 사용기, 여행 후기 등 다양한 주제의 글을 작성합니다.</p>
+                <h3 className="text-lg md:text-xl font-bold mb-2">자유 주제/일상 리뷰</h3>
+                <p className="text-gray-400 text-xs md:text-sm leading-relaxed">일상 기록, 제품 사용기, 여행 후기 등 다양한 주제의 글을 작성합니다.</p>
               </button>
             </div>
           </div>
@@ -362,38 +370,38 @@ const MainApp: React.FC = () => {
 
         {/* Step 1: Upload */}
         {step === AppStep.UPLOAD && (
-          <div className="p-10 animate-fadeIn">
-            <h2 className="text-2xl font-bold mb-2 text-gray-900">
+          <div className="p-6 md:p-10 animate-fadeIn">
+            <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-900">
               {isRestaurant ? "생생한 식당 사진을 올려주세요" : "관련된 사진을 올려주세요"}
             </h2>
-            <p className="text-gray-500 mb-8">AI가 사진을 분석하여 더 풍성한 글을 작성해드립니다.</p>
+            <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8">AI가 사진을 분석하여 더 풍성한 글을 작성해드립니다.</p>
             <div 
-              className="border-4 border-dashed border-gray-100 rounded-[2rem] p-16 bg-gray-50 text-center cursor-pointer hover:bg-green-50 hover:border-[#03c75a]/30 transition-all group"
+              className="border-4 border-dashed border-gray-100 rounded-3xl md:rounded-[2rem] p-8 md:p-16 bg-gray-50 text-center cursor-pointer hover:bg-green-50 hover:border-[#03c75a]/30 transition-all group"
               onClick={() => document.getElementById('photo-input')?.click()}
             >
-              <i className="fas fa-images text-5xl text-gray-200 mb-6 group-hover:text-[#03c75a]/50 transition-colors"></i>
-              <p className="text-xl font-bold text-gray-700">여기를 클릭하여 사진 추가</p>
-              <p className="text-sm text-gray-400 mt-2">최대 10장까지 추천합니다.</p>
+              <i className="fas fa-images text-4xl md:text-5xl text-gray-200 mb-4 md:mb-6 group-hover:text-[#03c75a]/50 transition-colors"></i>
+              <p className="text-lg md:text-xl font-bold text-gray-700">여기를 클릭하여 사진 추가</p>
+              <p className="text-xs md:text-sm text-gray-400 mt-2">최대 10장까지 추천합니다.</p>
               <input id="photo-input" type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             </div>
             {photos.length > 0 && (
-              <div className="mt-8 grid grid-cols-3 sm:grid-cols-5 gap-3">
+              <div className="mt-6 md:mt-8 grid grid-cols-3 sm:grid-cols-5 gap-2 md:gap-3">
                 {photos.map(p => (
-                  <div key={p.id} className="relative aspect-square rounded-2xl overflow-hidden border shadow-sm group">
+                  <div key={p.id} className="relative aspect-square rounded-xl md:rounded-2xl overflow-hidden border shadow-sm group">
                     <img src={p.previewUrl} className="w-full h-full object-cover" />
-                    <button onClick={() => setPhotos(photos.filter(x => x.id !== p.id))} className="absolute top-1 right-1 bg-black/60 text-white w-6 h-6 rounded-lg text-xs hover:bg-red-500 transition-colors">×</button>
+                    <button onClick={() => setPhotos(photos.filter(x => x.id !== p.id))} className="absolute top-1 right-1 bg-black/60 text-white w-5 h-5 md:w-6 md:h-6 rounded-lg text-[10px] md:text-xs hover:bg-red-500 transition-colors">×</button>
                   </div>
                 ))}
               </div>
             )}
-            <div className="mt-10 flex gap-4">
-              <button onClick={() => setStep(AppStep.SELECT_TYPE)} className="flex-1 p-5 bg-white border border-gray-100 text-gray-400 font-bold rounded-2xl transition-all hover:bg-gray-50">이전 단계</button>
+            <div className="mt-8 md:mt-10 flex gap-3 md:gap-4">
+              <button onClick={() => setStep(AppStep.SELECT_TYPE)} className="flex-1 p-4 md:p-5 bg-white border border-gray-100 text-gray-400 font-bold rounded-2xl transition-all hover:bg-gray-50 text-sm md:text-base">이전 단계</button>
               <button 
                 onClick={() => setStep(AppStep.INFO)} 
                 disabled={photos.length === 0} 
-                className="flex-[2] bg-[#03c75a] text-white font-bold py-5 rounded-2xl shadow-lg shadow-green-100 disabled:bg-gray-200 disabled:shadow-none transition-all hover:bg-[#02b351]"
+                className="flex-[2] bg-[#03c75a] text-white font-bold py-4 md:py-5 rounded-2xl shadow-lg shadow-green-100 disabled:bg-gray-200 disabled:shadow-none transition-all hover:bg-[#02b351] text-sm md:text-base"
               >
-                정보 입력하러 가기 <i className="fas fa-chevron-right ml-2 text-sm"></i>
+                정보 입력하러 가기 <i className="fas fa-chevron-right ml-2 text-xs md:text-sm"></i>
               </button>
             </div>
           </div>
@@ -401,37 +409,37 @@ const MainApp: React.FC = () => {
 
         {/* Step 2: Info */}
         {step === AppStep.INFO && (
-          <div className="p-10 animate-fadeIn h-full overflow-y-auto">
-            <h2 className="text-2xl font-bold mb-8 text-gray-900">{isRestaurant ? "식당 특징 입력" : "주제 및 특징 입력"}</h2>
+          <div className="p-6 md:p-10 animate-fadeIn h-full overflow-y-auto">
+            <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-gray-900">{isRestaurant ? "식당 특징 입력" : "주제 및 특징 입력"}</h2>
             
-            <div className="space-y-6">
+            <div className="space-y-4 md:space-y-6">
               {isRestaurant ? (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700 ml-1">식당 이름 <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="예: 성수 비보 (VIVO)" value={blogInfo.name} onChange={e => setBlogInfo({...blogInfo, name: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+                      <input type="text" placeholder="예: 성수 비보 (VIVO)" value={blogInfo.name} onChange={e => setBlogInfo({...blogInfo, name: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700 ml-1">지역/위치 <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="예: 서울 성동구 연무장길" value={blogInfo.location} onChange={e => setBlogInfo({...blogInfo, location: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+                      <input type="text" placeholder="예: 서울 성동구 연무장길" value={blogInfo.location} onChange={e => setBlogInfo({...blogInfo, location: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base" />
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-bold text-gray-700 ml-1">드셨던 주요 메뉴</label>
-                    <input type="text" placeholder="예: 비보 피자, 라구 파스타" value={blogInfo.mainMenu} onChange={e => setBlogInfo({...blogInfo, mainMenu: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+                    <input type="text" placeholder="예: 비보 피자, 라구 파스타" value={blogInfo.mainMenu} onChange={e => setBlogInfo({...blogInfo, mainMenu: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base" />
                   </div>
                 </>
               ) : (
                 <>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700 ml-1">글 제목 또는 주제 <span className="text-red-500">*</span></label>
-                      <input type="text" placeholder="예: 아이폰 15 프로 사용후기" value={blogInfo.subject} onChange={e => setBlogInfo({...blogInfo, subject: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+                      <input type="text" placeholder="예: 아이폰 15 프로 사용후기" value={blogInfo.subject} onChange={e => setBlogInfo({...blogInfo, subject: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base" />
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700 ml-1">카테고리 <span className="text-red-500">*</span></label>
-                      <select value={blogInfo.category} onChange={e => setBlogInfo({...blogInfo, category: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all appearance-none">
+                      <select value={blogInfo.category} onChange={e => setBlogInfo({...blogInfo, category: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all appearance-none text-sm md:text-base">
                         <option value="">카테고리 선택</option>
                         <option value="일상">일상/생각</option>
                         <option value="제품리뷰">IT/제품 리뷰</option>
@@ -446,7 +454,7 @@ const MainApp: React.FC = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-700 ml-1">분위기 또는 특징</label>
-                <input type="text" placeholder={isRestaurant ? "예: 힙한 느낌, 조용한, 데이트 코스" : "예: 가성비 좋은, 감성 넘치는, 실용적인"} value={blogInfo.mood} onChange={e => setBlogInfo({...blogInfo, mood: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+                <input type="text" placeholder={isRestaurant ? "예: 힙한 느낌, 조용한, 데이트 코스" : "예: 가성비 좋은, 감성 넘치는, 실용적인"} value={blogInfo.mood} onChange={e => setBlogInfo({...blogInfo, mood: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base" />
               </div>
 
               <div className="space-y-2">
@@ -462,7 +470,7 @@ const MainApp: React.FC = () => {
                       const selected = writingStyles.find(s => s.id === e.target.value);
                       setBlogInfo({...blogInfo, writingStyle: selected ? selected.content : ''});
                     }}
-                    className="w-full p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all appearance-none"
+                    className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all appearance-none text-sm md:text-base"
                   >
                     <option value="">말투를 선택하지 않음 (기본 말투)</option>
                     {writingStyles.map(style => (
@@ -479,13 +487,13 @@ const MainApp: React.FC = () => {
 
               <div className="space-y-2">
                 <label className="text-sm font-bold text-gray-700 ml-1">나만의 특별한 메모</label>
-                <textarea placeholder="직접 느꼈던 점을 자유롭게 적어주세요. AI가 자연스럽게 문장으로 녹여냅니다." rows={4} value={blogInfo.specialNotes} onChange={e => setBlogInfo({...blogInfo, specialNotes: e.target.value})} className="w-full p-5 bg-gray-50 rounded-2xl border-none resize-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all" />
+                <textarea placeholder="직접 느꼈던 점을 자유롭게 적어주세요. AI가 자연스럽게 문장으로 녹여냅니다." rows={4} value={blogInfo.specialNotes} onChange={e => setBlogInfo({...blogInfo, specialNotes: e.target.value})} className="w-full p-4 md:p-5 bg-gray-50 rounded-2xl border-none resize-none outline-none focus:ring-2 focus:ring-[#03c75a] transition-all text-sm md:text-base" />
               </div>
 
               <div className="space-y-4">
                 <div className="flex justify-between items-center px-1">
                   <label className="text-sm font-bold text-gray-700">추천 평점</label>
-                  <span className="text-xl font-black text-[#03c75a]">{blogInfo.rating} / 5</span>
+                  <span className="text-lg md:text-xl font-black text-[#03c75a]">{blogInfo.rating} / 5</span>
                 </div>
                 <input 
                   type="range" min="1" max="5" step="0.5" 
@@ -496,17 +504,17 @@ const MainApp: React.FC = () => {
               </div>
             </div>
 
-            <div className="mt-10 flex gap-4">
-              <button onClick={() => setStep(AppStep.UPLOAD)} className="flex-1 p-5 bg-white border border-gray-100 text-gray-400 font-bold rounded-2xl transition-all hover:bg-gray-50">이전 단계</button>
+            <div className="mt-8 md:mt-10 flex gap-3 md:gap-4">
+              <button onClick={() => setStep(AppStep.UPLOAD)} className="flex-1 p-4 md:p-5 bg-white border border-gray-100 text-gray-400 font-bold rounded-2xl transition-all hover:bg-gray-50 text-sm md:text-base">이전 단계</button>
               <button 
                 onClick={generateBlog} 
                 disabled={!isInfinite && credits < 1}
-                className="flex-[2] bg-[#03c75a] text-white font-bold py-5 rounded-2xl shadow-lg shadow-green-100 disabled:bg-gray-200 disabled:shadow-none disabled:cursor-not-allowed transition-all hover:bg-[#02b351] active:scale-95"
+                className="flex-[2] bg-[#03c75a] text-white font-bold py-4 md:py-5 rounded-2xl shadow-lg shadow-green-100 disabled:bg-gray-200 disabled:shadow-none disabled:cursor-not-allowed transition-all hover:bg-[#02b351] active:scale-95 text-sm md:text-base"
               >
                 {!isInfinite && credits < 1 ? (
-                  <>작성권 부족 <i className="fas fa-exclamation-circle ml-2"></i></>
+                  <>작성권 부족 <i className="fas fa-exclamation-circle ml-2 text-xs"></i></>
                 ) : (
-                  <>블로그 작성 시작 <i className="fas fa-magic ml-2"></i></>
+                  <>블로그 작성 시작 <i className="fas fa-magic ml-2 text-xs md:text-sm"></i></>
                 )}
               </button>
             </div>
