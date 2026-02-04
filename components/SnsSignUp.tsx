@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -180,8 +181,8 @@ const SnsSignUp: React.FC<SnsSignUpProps> = ({ onClose }) => {
       </button>
 
       {/* 약관 모달 */}
-      {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+      {showModal && createPortal(
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[300] flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-3xl shadow-2xl overflow-hidden flex flex-col animate-fadeIn">
             <div className="p-6 border-b flex justify-between items-center bg-gray-50">
               <h3 className="font-black text-gray-900">{showModal.title}</h3>
@@ -203,7 +204,8 @@ const SnsSignUp: React.FC<SnsSignUpProps> = ({ onClose }) => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );
