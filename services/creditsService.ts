@@ -2,9 +2,9 @@ import { collection, doc, getDoc, getDocs, setDoc, updateDoc, query, orderBy, wh
 import { db } from "../lib/firebase";
 
 const USERS_COLLECTION = "users";
-const INITIAL_CREDITS = 0;
-const NAVER_SIGNUP_CREDITS = 5;
-export const CREDITS_PER_BLOG = 1;
+const INITIAL_CREDITS = 1000;
+const NAVER_SIGNUP_CREDITS = 1000;
+export const CREDITS_PER_BLOG = 100; // Base cost
 
 export interface UserProfile {
   id?: string;
@@ -92,7 +92,7 @@ export const checkUserExistsByEmail = async (email: string): Promise<boolean> =>
   return !snap.empty;
 };
 
-export const deductCredit = async (userId: string): Promise<number> => {
+export const deductCredit = async (userId: string, amount: number = CREDITS_PER_BLOG): Promise<number> => {
   const userRef = doc(db, USERS_COLLECTION, userId);
   const snap = await getDoc(userRef);
   if (!snap.exists()) {
@@ -102,12 +102,12 @@ export const deductCredit = async (userId: string): Promise<number> => {
   
   if (data.isInfinite) return data.blogCredits;
 
-  const newCredits = Math.max(0, data.blogCredits - CREDITS_PER_BLOG);
+  const newCredits = Math.max(0, data.blogCredits - amount);
   await updateDoc(userRef, { blogCredits: newCredits });
   return newCredits;
 };
 
-export const refundCredit = async (userId: string): Promise<number> => {
+export const refundCredit = async (userId: string, amount: number = CREDITS_PER_BLOG): Promise<number> => {
   const userRef = doc(db, USERS_COLLECTION, userId);
   const snap = await getDoc(userRef);
   if (!snap.exists()) return 0;
@@ -115,7 +115,7 @@ export const refundCredit = async (userId: string): Promise<number> => {
 
   if (data.isInfinite) return data.blogCredits;
 
-  const newCredits = data.blogCredits + CREDITS_PER_BLOG;
+  const newCredits = data.blogCredits + amount;
   await updateDoc(userRef, { blogCredits: newCredits });
   return newCredits;
 };
@@ -129,7 +129,7 @@ export const grantEmailVerificationReward = async (userId: string): Promise<bool
   if (data.emailVerifiedRewardGiven) return false;
 
   await updateDoc(userRef, {
-    blogCredits: data.blogCredits + 5,
+    blogCredits: data.blogCredits + 1000,
     emailVerifiedRewardGiven: true
   });
   return true;

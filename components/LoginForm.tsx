@@ -33,7 +33,7 @@ const LoginForm: React.FC = () => {
         </h2>
         <p className="text-gray-500 text-xs md:text-sm">
           네이버 로그인을 통해 간편하게 시작해보세요.<br/>
-          첫 가입 시 블로그 작성권 5회를 드려요!
+          첫 가입 시 1000포인트를 드려요!
         </p>
       </div>
 

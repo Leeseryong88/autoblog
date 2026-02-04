@@ -40,6 +40,12 @@ const LandingPage: React.FC = () => {
             사진만 올리세요.<br/>
             <span className="text-[#03c75a]">완벽한 블로그</span>는 AI가 씁니다.
           </h1>
+          <div className="flex justify-center mb-10">
+            <div className="inline-flex items-center gap-2 px-5 py-2.5 bg-orange-50 text-orange-600 rounded-2xl font-bold text-sm md:text-base border border-orange-100 shadow-sm">
+              <i className="fas fa-coffee"></i>
+              <span>커피 한 잔 값으로 실현하는 완벽한 1일 1포스팅</span>
+            </div>
+          </div>
           <p className="text-base md:text-xl text-gray-500 mb-10 md:mb-12 max-w-2xl mx-auto leading-relaxed px-4 md:px-0">
             단순한 글쓰기가 아닙니다. 최신 블로그 트렌드를 실시간으로 참조하여 
             당신의 일상을 가장 매력적인 포스팅으로 탈바꿈시킵니다.
@@ -52,7 +58,7 @@ const LandingPage: React.FC = () => {
               지금 바로 글쓰기 <i className="fas fa-magic ml-2"></i>
             </button>
             <div className="flex items-center gap-2 text-gray-400 text-sm md:text-base font-medium">
-              <i className="fas fa-check-circle text-[#03c75a]"></i> 이메일 인증 시 작성권 5회 즉시 지급
+              <i className="fas fa-check-circle text-[#03c75a]"></i> 이메일 인증 시 1000포인트 즉시 지급
             </div>
           </div>
         </div>
@@ -338,7 +344,8 @@ const LandingPage: React.FC = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-20 -mt-20 blur-3xl"></div>
           <div className="relative z-10">
             <h2 className="text-2xl md:text-5xl font-black mb-6 md:mb-8 leading-tight break-keep">
-              지금 바로 고품격 블로그<br/>포스팅을 시작해보세요.
+              지금 바로 무료포인트와 함께<br/>
+              시작해보세요.
             </h2>
             <button 
               onClick={handleStart}

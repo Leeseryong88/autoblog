@@ -29,8 +29,8 @@ interface AuthContextType {
   signInWithNaver: (accessToken: string) => Promise<void>;
   signUpWithNaver: (accessToken: string, extraData?: any) => Promise<void>;
   signOut: () => Promise<void>;
-  useBlogCredit: () => Promise<boolean>;
-  refundBlogCredit: () => Promise<void>;
+  useBlogCredit: (amount: number) => Promise<boolean>;
+  refundBlogCredit: (amount: number) => Promise<void>;
   refreshCredits: () => Promise<void>;
   writingStyle: string;
   writingStyles: WritingStyle[];
@@ -133,8 +133,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // 서버에서 직접 받은 email 값을 최우선으로 사용합니다.
       const finalEmail = email || newUser.email || "";
 
-      // 네이버 회원가입 시 5회 이용권 지급 및 연동 상태 저장
-      await initUserProfile(newUser.uid, finalEmail, { ...extraData, isNaverLinked: true }, 5);
+      // 네이버 회원가입 시 1000포인트 지급 및 연동 상태 저장
+      await initUserProfile(newUser.uid, finalEmail, { ...extraData, isNaverLinked: true }, 1000);
       
       // 클라이언트 Auth 객체 정보 업데이트
       await newUser.reload();
@@ -152,17 +152,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setWritingStyle("");
   };
 
-  const useBlogCredit = async (): Promise<boolean> => {
+  const useBlogCredit = async (amount: number): Promise<boolean> => {
     if (!user) return false;
-    if (!isInfinite && credits < CREDITS_PER_BLOG) return false;
-    const newCredits = await deductCredit(user.uid);
+    if (!isInfinite && credits < amount) return false;
+    const newCredits = await deductCredit(user.uid, amount);
     // setCredits and setIsInfinite are handled by onSnapshot
     return true;
   };
 
-  const refundBlogCredit = async () => {
+  const refundBlogCredit = async (amount: number) => {
     if (!user) return;
-    await refundCredit(user.uid);
+    await refundCredit(user.uid, amount);
     // setCredits and setIsInfinite are handled by onSnapshot
   };
 

@@ -80,6 +80,12 @@ const MainApp: React.FC = () => {
   const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files) as File[];
+      
+      if (photos.length + filesArray.length > 20) {
+        alert('사진은 최대 20장까지만 업로드할 수 있습니다.');
+        return;
+      }
+
       const newPhotos: PhotoData[] = [];
       for (const file of filesArray) {
         const resizedBase64 = await resizeImage(file);
@@ -94,9 +100,18 @@ const MainApp: React.FC = () => {
     }
   };
 
+  const calculateCost = () => {
+    let cost = 100; // 기본
+    cost += photos.length * 10; // 사진당 10포인트
+    if (blogInfo.writingStyle && blogInfo.writingStyle !== '') cost += 50; // 말투 설정
+    return cost;
+  };
+
   const generateBlog = async () => {
-    if (!isInfinite && credits < 1) {
-      alert('블로그 작성권이 부족합니다. 포인트를 충전해주세요.');
+    const totalCost = calculateCost();
+
+    if (!isInfinite && credits < totalCost) {
+      alert(`포인트가 부족합니다. (필요: ${totalCost}P, 보유: ${credits}P)\n포인트를 충전해주세요.`);
       return;
     }
     if (blogInfo.type === BlogType.RESTAURANT) {
@@ -111,9 +126,15 @@ const MainApp: React.FC = () => {
       }
     }
 
-    const used = await useBlogCredit();
+    if (!isInfinite) {
+      if (!window.confirm(`총 ${totalCost}포인트가 차감됩니다.\n(기본 100P + 사진 ${photos.length * 10}P${blogInfo.writingStyle ? ' + 말투 50P' : ''})\n\n작성을 시작하시겠습니까?`)) {
+        return;
+      }
+    }
+
+    const used = await useBlogCredit(totalCost);
     if (!used) {
-      alert('블로그 작성권 사용에 실패했습니다. 잔여 포인트를 확인해주세요.');
+      alert('포인트 사용에 실패했습니다. 잔여 포인트를 확인해주세요.');
       return;
     }
 
@@ -123,8 +144,8 @@ const MainApp: React.FC = () => {
       setGeneratedPost(blog);
       setStep(AppStep.RESULT);
     } catch (error) {
-      await refundBlogCredit();
-      alert('오류가 발생했습니다. 작성권이 반환되었습니다. 다시 시도해주세요.');
+      await refundBlogCredit(totalCost);
+      alert('오류가 발생했습니다. 포인트가 반환되었습니다. 다시 시도해주세요.');
       setStep(AppStep.INFO);
     }
   };
@@ -203,7 +224,7 @@ const MainApp: React.FC = () => {
             className="flex items-center gap-2 bg-[#03c75a]/10 text-[#03c75a] px-3 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl font-bold cursor-pointer transition-all hover:bg-[#03c75a]/20 text-xs md:text-sm"
           >
             <i className="fas fa-coins"></i>
-            <span>{isInfinite ? '무제한' : `작성권 ${credits}회`}</span>
+            <span>{isInfinite ? '무제한' : `${credits} P`}</span>
           </div>
           
           <div className="flex items-center gap-2">
@@ -261,20 +282,6 @@ const MainApp: React.FC = () => {
                   onChange={e => setNewStyle({...newStyle, content: e.target.value})}
                   className="w-full p-4 md:p-5 bg-white rounded-2xl border border-gray-100 text-sm md:text-base outline-none focus:ring-2 focus:ring-[#03c75a] transition-all resize-none shadow-sm"
                 />
-                <button 
-                  onClick={() => {
-                    if (!newStyle.title || !newStyle.content) {
-                      alert('제목과 내용을 모두 입력해주세요.');
-                      return;
-                    }
-                    const updated = [...editingStyles, { ...newStyle, id: Math.random().toString(36).substr(2, 9) }];
-                    setEditingStyles(updated);
-                    setNewStyle({ title: '', content: '' });
-                  }}
-                  className="w-full py-4 bg-[#03c75a] text-white rounded-2xl font-bold text-sm md:text-base hover:bg-[#02b351] shadow-lg shadow-green-100 transition-all active:scale-[0.98]"
-                >
-                  <i className="fas fa-plus mr-2"></i> 말투 목록에 추가하기
-                </button>
               </div>
 
               {/* 저장된 말투 목록 */}
@@ -305,9 +312,22 @@ const MainApp: React.FC = () => {
               <button onClick={() => setShowStyleModal(false)} className="flex-1 py-3 md:py-4 bg-white border border-gray-200 text-gray-500 rounded-2xl font-bold hover:bg-gray-50 transition-all text-xs md:text-sm">취소</button>
               <button 
                 onClick={async () => {
+                  let stylesToSave = [...editingStyles];
+                  
+                  // 새 말투 입력값이 있다면 추가
+                  if (newStyle.title && newStyle.content) {
+                    stylesToSave = [...stylesToSave, { ...newStyle, id: Math.random().toString(36).substr(2, 9) }];
+                  } else if (newStyle.title || newStyle.content) {
+                    // 하나만 입력된 경우 경고
+                    alert('새 말투를 추가하려면 제목과 내용을 모두 입력해주세요.');
+                    return;
+                  }
+
                   setIsSavingStyle(true);
                   try {
-                    await saveUserWritingStyles(editingStyles);
+                    await saveUserWritingStyles(stylesToSave);
+                    setEditingStyles(stylesToSave); // 로컬 상태도 업데이트
+                    setNewStyle({ title: '', content: '' }); // 입력폼 초기화
                     alert('성공적으로 저장되었습니다!');
                     setShowStyleModal(false);
                   } catch (err) {
@@ -382,7 +402,7 @@ const MainApp: React.FC = () => {
                   </p>
                 </div>
                 <div className="px-3 py-1 bg-white rounded-lg text-[10px] font-bold text-green-600 border border-green-200">
-                  {isInfinite ? '무제한 이용 중' : `작성권 ${credits}회`}
+                  {isInfinite ? '무제한 이용 중' : `${credits} P`}
                 </div>
               </div>
             </div>
@@ -436,16 +456,22 @@ const MainApp: React.FC = () => {
         {step === AppStep.UPLOAD && (
           <div className="p-6 md:p-10 animate-fadeIn">
             <h2 className="text-xl md:text-2xl font-bold mb-2 text-gray-900">
-              {isRestaurant ? "생생한 식당 사진을 올려주세요" : "관련된 사진을 올려주세요"}
+              {isRestaurant ? "생생한 식당 사진을 올려주세요" : "관련된 사진을 올려주세요"} 
+              <span className="ml-2 text-sm text-[#03c75a] font-normal">(1장당 10P 차감)</span>
             </h2>
-            <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8">AI가 사진을 분석하여 더 풍성한 글을 작성해드립니다.</p>
+            <p className="text-sm md:text-base text-gray-500 mb-6 md:mb-8">
+              AI가 사진을 분석하여 더 풍성한 글을 작성해드립니다. 
+              <span className="font-bold text-[#03c75a] ml-1">
+                현재 예상 차감 포인트: {calculateCost()}P
+              </span>
+            </p>
             <div 
               className="border-4 border-dashed border-gray-100 rounded-3xl md:rounded-[2rem] p-8 md:p-16 bg-gray-50 text-center cursor-pointer hover:bg-green-50 hover:border-[#03c75a]/30 transition-all group"
               onClick={() => document.getElementById('photo-input')?.click()}
             >
               <i className="fas fa-images text-4xl md:text-5xl text-gray-200 mb-4 md:mb-6 group-hover:text-[#03c75a]/50 transition-colors"></i>
               <p className="text-lg md:text-xl font-bold text-gray-700">여기를 클릭하여 사진 추가</p>
-              <p className="text-xs md:text-sm text-gray-400 mt-2">최대 10장까지 추천합니다.</p>
+              <p className="text-xs md:text-sm text-gray-400 mt-2">최대 20장까지 업로드 가능합니다.</p>
               <input id="photo-input" type="file" multiple accept="image/*" className="hidden" onChange={handlePhotoUpload} />
             </div>
             {photos.length > 0 && (
@@ -474,7 +500,12 @@ const MainApp: React.FC = () => {
         {/* Step 2: Info */}
         {step === AppStep.INFO && (
           <div className="p-6 md:p-10 animate-fadeIn h-full overflow-y-auto">
-            <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-gray-900">{isRestaurant ? "식당 특징 입력" : "주제 및 특징 입력"}</h2>
+            <h2 className="text-xl md:text-2xl font-bold mb-6 md:mb-8 text-gray-900 flex items-center gap-2">
+              {isRestaurant ? "식당 특징 입력" : "주제 및 특징 입력"}
+              <span className="text-sm text-[#03c75a] font-normal bg-green-50 px-3 py-1 rounded-full">
+                예상 차감: {calculateCost()}P
+              </span>
+            </h2>
             
             <div className="space-y-4 md:space-y-6">
               {isRestaurant ? (
@@ -522,7 +553,10 @@ const MainApp: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-bold text-gray-700 ml-1">나만의 블로그 말투 선택 (선택)</label>
+                <label className="text-sm font-bold text-gray-700 ml-1">
+                  나만의 블로그 말투 선택 (선택)
+                  <span className="text-xs text-[#03c75a] ml-2 font-normal">적용 시 50P 차감</span>
+                </label>
                 <div className="relative">
                   <select 
                     value={writingStyles.find(s => s.content === blogInfo.writingStyle)?.id || ''} 
@@ -572,11 +606,11 @@ const MainApp: React.FC = () => {
               <button onClick={() => setStep(AppStep.UPLOAD)} className="flex-1 p-4 md:p-5 bg-white border border-gray-100 text-gray-400 font-bold rounded-2xl transition-all hover:bg-gray-50 text-sm md:text-base">이전 단계</button>
               <button 
                 onClick={generateBlog} 
-                disabled={!isInfinite && credits < 1}
+                disabled={!isInfinite && credits < calculateCost()}
                 className="flex-[2] bg-[#03c75a] text-white font-bold py-4 md:py-5 rounded-2xl shadow-lg shadow-green-100 disabled:bg-gray-200 disabled:shadow-none disabled:cursor-not-allowed transition-all hover:bg-[#02b351] active:scale-95 text-sm md:text-base"
               >
-                {!isInfinite && credits < 1 ? (
-                  <>작성권 부족 <i className="fas fa-exclamation-circle ml-2 text-xs"></i></>
+                {!isInfinite && credits < calculateCost() ? (
+                  <>포인트 부족 ({calculateCost()}P 필요) <i className="fas fa-exclamation-circle ml-2 text-xs"></i></>
                 ) : (
                   <>블로그 작성 시작 <i className="fas fa-magic ml-2 text-xs md:text-sm"></i></>
                 )}

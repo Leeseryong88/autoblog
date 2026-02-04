@@ -82,7 +82,7 @@ const AdminPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   };
 
   const handleAddCredits = async (userId: string, amount: number) => {
-    if (!window.confirm(`${amount}회의 작성권을 지급하시겠습니까?`)) return;
+    if (!window.confirm(`${amount}포인트를 지급하시겠습니까?`)) return;
     
     try {
       setActionLoading(userId);
@@ -174,7 +174,7 @@ const AdminPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                 <tr className="border-b-2 border-gray-100">
                   <th className="py-4 px-2 text-sm font-bold text-gray-400">가입일</th>
                   <th className="py-4 px-2 text-sm font-bold text-gray-400">이메일</th>
-                  <th className="py-4 px-2 text-sm font-bold text-gray-400 text-center">잔여 작성권</th>
+                  <th className="py-4 px-2 text-sm font-bold text-gray-400 text-center">잔여 포인트</th>
                   <th className="py-4 px-2 text-sm font-bold text-gray-400 text-right">관리</th>
                 </tr>
               </thead>
@@ -207,7 +207,7 @@ const AdminPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                           </span>
                         ) : (
                           <span className="bg-green-50 text-[#03c75a] px-3 py-1 rounded-full text-sm font-bold">
-                            {user.blogCredits}회
+                            {user.blogCredits} P
                           </span>
                         )}
                       </td>
@@ -286,7 +286,7 @@ const AdminPage: React.FC<{ onBack: () => void }> = ({ onBack }) => {
                       </span>
                     ) : (
                       <span className="bg-green-50 text-[#03c75a] px-2 py-1 rounded-full text-[10px] font-bold">
-                        {user.blogCredits}회 남음
+                        {user.blogCredits} P
                       </span>
                     )}
                   </div>
