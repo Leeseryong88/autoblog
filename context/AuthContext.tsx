@@ -2,13 +2,10 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import {
   User,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
   signOut as firebaseSignOut,
-  updatePassword,
-  fetchSignInMethodsForEmail,
+  signInWithCustomToken,
 } from "firebase/auth";
+import { getFunctions, httpsCallable } from "firebase/functions";
 import { auth } from "../lib/firebase";
 import {
   getCredits,
@@ -20,7 +17,7 @@ import {
   CREDITS_PER_BLOG,
   UserProfile,
 } from "../services/creditsService";
-import { doc, onSnapshot } from "firebase/firestore";
+import { doc, onSnapshot, getDoc } from "firebase/firestore";
 import { db } from "../lib/firebase";
 
 interface AuthContextType {
@@ -29,8 +26,8 @@ interface AuthContextType {
   isInfinite: boolean;
   isAdmin: boolean;
   loading: boolean;
-  signInWithNaver: (email: string, naverId: string) => Promise<void>;
-  signUpWithNaver: (email: string, naverId: string, extraData?: any) => Promise<void>;
+  signInWithNaver: (accessToken: string) => Promise<void>;
+  signUpWithNaver: (accessToken: string, extraData?: any) => Promise<void>;
   signOut: () => Promise<void>;
   useBlogCredit: () => Promise<boolean>;
   refundBlogCredit: () => Promise<void>;
@@ -76,16 +73,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const unsubAuth = onAuthStateChanged(auth, async (u) => {
       if (u) {
-        // Naver 가입 직후에는 signUpWithNaver에서 5회 이용권을 세팅하므로,
-        // 여기서는 데이터가 없을 때만 기본 프로필을 생성하도록 safe하게 처리
         const userRef = doc(db, "users", u.uid);
-        const { getDoc } = await import("firebase/firestore");
-        const docSnap = await getDoc(userRef);
         
-        if (!docSnap.exists()) {
-          await initUserProfile(u.uid, u.email || "");
-        }
-
         setUser(u);
         
         // 실시간 프로필 동기화
@@ -114,18 +103,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
   }, []);
 
-  const signInWithNaver = async (email: string, naverId: string) => {
-    // Naver 고유 ID를 비밀번호로 사용하여 로그인 시도
-    await signInWithEmailAndPassword(auth, email, naverId);
+  const signInWithNaver = async (accessToken: string) => {
+    const functions = getFunctions();
+    const verifyNaverToken = httpsCallable(functions, "verifyNaverToken");
+    
+    const result = await verifyNaverToken({ accessToken });
+    const { customToken, isRegistered } = result.data as { customToken: string; isRegistered: boolean };
+    
+    // 가입되지 않은 사용자라면 로그인을 진행하지 않고 바로 중단
+    if (!isRegistered) {
+      throw new Error("USER_NOT_FOUND");
+    }
+    
+    await signInWithCustomToken(auth, customToken);
   };
 
-  const signUpWithNaver = async (email: string, naverId: string, extraData?: any) => {
+  const signUpWithNaver = async (accessToken: string, extraData?: any) => {
     try {
-      const { user: newUser } = await createUserWithEmailAndPassword(auth, email, naverId);
+      const functions = getFunctions();
+      const verifyNaverToken = httpsCallable(functions, "verifyNaverToken");
+      
+      const result = await verifyNaverToken({ accessToken });
+      const { customToken, email } = result.data as { customToken: string; email: string };
+      
+      const userCredential = await signInWithCustomToken(auth, customToken);
+      const newUser = userCredential.user;
+
+      // Firestore 프로필 생성 시 email 값이 Auth 객체에 아직 반영되지 않았을 수 있으므로 
+      // 서버에서 직접 받은 email 값을 최우선으로 사용합니다.
+      const finalEmail = email || newUser.email || "";
+
       // 네이버 회원가입 시 5회 이용권 지급 및 연동 상태 저장
-      await initUserProfile(newUser.uid, newUser.email || "", { ...extraData, isNaverLinked: true, naverId }, 5);
+      await initUserProfile(newUser.uid, finalEmail, { ...extraData, isNaverLinked: true }, 5);
+      
+      // 클라이언트 Auth 객체 정보 업데이트
+      await newUser.reload();
     } catch (err: any) {
-      if (err.code === "auth/email-already-in-use") {
+      if (err.code === "auth/email-already-in-use" || err.code === "already-exists") {
         throw new Error("ALREADY_EXISTS");
       }
       throw err;

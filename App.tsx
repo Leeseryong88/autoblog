@@ -199,7 +199,7 @@ const MainApp: React.FC = () => {
 
         <div className="flex flex-wrap items-center justify-between gap-2 bg-white/50 p-2 rounded-2xl md:bg-transparent md:p-0">
           <div 
-            onClick={() => alert('이용권 구매 시스템 적용예정입니다.')}
+            onClick={() => alert('현재 테스트 버전으로 추가 이용권을 구매할 수 없습니다. 추가 구매를 원할 경우 제작자에게 문의하여 주시기 바랍니다.')}
             className="flex items-center gap-2 bg-[#03c75a]/10 text-[#03c75a] px-3 py-1.5 md:px-4 md:py-2 rounded-xl md:rounded-2xl font-bold cursor-pointer transition-all hover:bg-[#03c75a]/20 text-xs md:text-sm"
           >
             <i className="fas fa-coins"></i>

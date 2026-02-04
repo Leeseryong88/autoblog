@@ -30,16 +30,29 @@ const NaverCallback: React.FC = () => {
     naverLogin.getLoginStatus(async (status: boolean) => {
       if (status) {
         const naverUser = naverLogin.user;
-        console.log("Naver user data fetched:", { email: naverUser.email, id: !!naverUser.id });
+        const accessToken = (naverLogin as any).accessToken.accessToken;
+        console.log("Naver user data fetched, attempting Firebase login...");
         
-        if (naverUser.email && naverUser.id) {
+        if (accessToken) {
           try {
-            // 로그인 시도
-            await signInWithNaver(naverUser.email, naverUser.id);
-            console.log("Firebase login success via Naver");
+            // 로그인 시도 (정석적인 방법: accessToken 전달)
+            await signInWithNaver(accessToken);
+            console.log("Firebase login success via Naver Custom Token");
             navigate("/write");
           } catch (err: any) {
             console.error("Firebase login failed:", err.code, err.message);
+            
+            if (err.code === "already-exists") {
+              alert("이미 가입된 이메일입니다. 다른 방법으로 로그인해주세요.");
+              navigate("/");
+              return;
+            }
+
+            if (err.code === "invalid-argument") {
+              alert(err.message);
+              navigate("/");
+              return;
+            }
             
             // 가입 정보가 없거나 기타 에러인 경우 회원가입 유도
             const userData = {
@@ -47,6 +60,7 @@ const NaverCallback: React.FC = () => {
               id: naverUser.id,
               name: naverUser.name || "",
               nickname: naverUser.nickname || "",
+              accessToken: accessToken, // 회원가입 시 필요
             };
             sessionStorage.setItem("pendingNaverUser", JSON.stringify(userData));
 

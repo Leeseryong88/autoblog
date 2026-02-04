@@ -36,7 +36,7 @@ const SnsSignUp: React.FC<SnsSignUpProps> = ({ onClose }) => {
   
   const [formData, setFormData] = useState({
     email: "",
-    id: ""
+    accessToken: ""
   });
   
   const [agreements, setAgreements] = useState({
@@ -58,7 +58,7 @@ const SnsSignUp: React.FC<SnsSignUpProps> = ({ onClose }) => {
     const user = JSON.parse(pendingUser);
     setFormData({
       email: user.email || "",
-      id: user.id || ""
+      accessToken: user.accessToken || ""
     });
   }, [onClose]);
 
@@ -78,7 +78,7 @@ const SnsSignUp: React.FC<SnsSignUpProps> = ({ onClose }) => {
   };
 
   const handleSignUp = async () => {
-    if (!formData.email || !formData.id) {
+    if (!formData.accessToken) {
       alert("네이버 인증 정보가 누락되었습니다. 다시 로그인해주세요.");
       onClose();
       return;
@@ -91,7 +91,7 @@ const SnsSignUp: React.FC<SnsSignUpProps> = ({ onClose }) => {
     
     setLoading(true);
     try {
-      await signUpWithNaver(formData.email, formData.id);
+      await signUpWithNaver(formData.accessToken);
       alert("회원가입이 완료되었습니다!\n이용권 5회가 지급되었습니다.");
       sessionStorage.removeItem("pendingNaverUser");
       onClose();
